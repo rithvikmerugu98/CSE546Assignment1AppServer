@@ -11,8 +11,8 @@ public class ImageDetail {
     }
 
 
-    public ImageDetail(String name, String requestId, String receiptHandle) {
-        this.name = name;
+    public ImageDetail(String requestId, String receiptHandle) {
+        this.name = requestId + ".jpg";
         this.requestId = requestId;
         this.receiptHandle = receiptHandle;
     }
@@ -50,5 +50,13 @@ public class ImageDetail {
     }
 
 
-
+    @Override
+    public String toString() {
+        return "ImageDetail{" +
+                "name='" + name + '\'' +
+                ", requestId='" + requestId + '\'' +
+                ", receiptHandle='" + receiptHandle + '\'' +
+                ", classifiedName='" + classifiedName + '\'' +
+                '}';
+    }
 }

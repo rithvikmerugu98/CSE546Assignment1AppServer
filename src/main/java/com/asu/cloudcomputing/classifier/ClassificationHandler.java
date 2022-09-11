@@ -40,12 +40,18 @@ public class ClassificationHandler {
     public List<ImageDetail> classifyImages(List<ImageDetail> imageDetails) throws IOException {
 
         for(ImageDetail imageDetail : imageDetails) {
-            Process p = Runtime.getRuntime().exec("python3 ../image_classification.py " + imageDetail.getName());
+            String command = "python3 ./image_classification.py " + imageDetail.getName();
+            Process p = Runtime.getRuntime().exec(command, null, new File("../"));
             BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String classifiedName = in.readLine();
-            imageDetail.setClassifiedName(classifiedName);
+            String scriptResult = in.readLine();
+            imageDetail.setClassifiedName(extractLabel(scriptResult));
+
         }
         return imageDetails;
+    }
+
+    private String extractLabel(String scriptResult) {
+        return scriptResult.split(",")[1];
     }
 
     public void writeToResponseQueue(List<ImageDetail> imageDetails) {
@@ -67,14 +73,14 @@ public class ClassificationHandler {
     public void saveToS3(List<ImageDetail> imageDetails) {
         for(ImageDetail details : imageDetails) {
             S3AWSClient s3Client = awsClientsProvider.getS3Client();
-            String bucketName = props.getProperty("aws.s3.bucket-name");
-            s3Client.uploadClassifiedImagesToS3(bucketName, details.getName());
+            String bucketName = props.getProperty("amazon.s3.bucket-name");
+            s3Client.uploadClassifiedImagesToS3(bucketName, details.getName(), details.getClassifiedName());
         }
     }
 
     public void deleteFilesLocally(List<ImageDetail> imageDetails) {
         for(ImageDetail imageDetail : imageDetails) {
-            File file = new File("../" + imageDetail.getName());
+            File file = new File("./" + imageDetail.getName());
             file.delete();
         }
     }

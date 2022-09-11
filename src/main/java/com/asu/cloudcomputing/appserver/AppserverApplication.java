@@ -33,9 +33,10 @@ public class AppserverApplication {
 			e.printStackTrace();
 		}
 		// Writing the response to response SQS Queue
+		System.out.println(imageDetails);
 		handler.writeToResponseQueue(imageDetails);
 		// Deleting the entries in request SQS Queue
-		handler.deleteFromRequestQueue(imageDetails);
+		//handler.deleteFromRequestQueue(imageDetails);
 		// Save the images in the bucket
 		handler.saveToS3(imageDetails);
 		// Delete locally saved files

@@ -20,25 +20,25 @@ public class SQSAWSClient {
 
     public List<ImageDetail> saveImageFromQueue(String queueURL) {
         List<ImageDetail> response = new ArrayList<>();
-        ReceiveMessageResponse receiveMessageResponse = sqsClient.receiveMessage(ReceiveMessageRequest.builder()
-                .queueUrl(queueURL)
+        ReceiveMessageResponse receiveMessageResponse = sqsClient.receiveMessage(
+                ReceiveMessageRequest.builder()
+                .queueUrl(queueURL).messageAttributeNames("*")
                 .maxNumberOfMessages(10).build());
         if(receiveMessageResponse.hasMessages()) {
             List<Message> messages = receiveMessageResponse.messages();
 
             for(Message message : messages) {
-                String name = message.messageAttributes().get("name").stringValue();
                 String requestId = message.messageAttributes().get("requestId").stringValue();
                 String receiptHandle = message.receiptHandle();
                 ByteArrayInputStream bis = new ByteArrayInputStream(Base64.getDecoder().decode(message.body()));
                 try {
                     BufferedImage bImage2 = ImageIO.read(bis);
-                    ImageIO.write(bImage2, "jpg", new File(name));
+                    ImageIO.write(bImage2, "jpg", new File(requestId + ".jpg"));
                 } catch (IOException e) {
-                    System.out.println("Unable to process image with request - " + name);
+                    System.out.println("Unable to process image with request - " + requestId);
                     continue;
                 }
-                response.add(new ImageDetail(name, requestId, receiptHandle));
+                response.add(new ImageDetail(requestId, receiptHandle));
             }
         }
         return response;
@@ -46,8 +46,8 @@ public class SQSAWSClient {
 
     public void publishMessages(String queueURL, String messageBody, String requestId, String name) {
         Map<String, MessageAttributeValue> attr = new HashMap<>();
-        attr.put("requestId", MessageAttributeValue.builder().stringValue(requestId).build());
-        attr.put("name", MessageAttributeValue.builder().stringValue(name).build());
+        attr.put("requestId", MessageAttributeValue.builder().dataType("String").stringValue(requestId).build());
+        attr.put("name", MessageAttributeValue.builder().dataType("String").stringValue(name).build());
         sqsClient.sendMessage(SendMessageRequest.builder()
                 .messageBody(messageBody)
                 .messageAttributes(attr)

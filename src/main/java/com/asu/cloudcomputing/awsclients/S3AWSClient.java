@@ -4,6 +4,7 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,9 +21,13 @@ public class S3AWSClient {
         s3Client = S3Client.builder().region(region).build();
     }
 
-    public void uploadClassifiedImagesToS3(String bucketName, String filePath) {
-        PutObjectRequest request = PutObjectRequest.builder().bucket(bucketName).key("/classifiedImages/" + filePath).build();
-        s3Client.putObject(request, RequestBody.fromBytes(getObjectFile("../"+filePath)));
+    public void uploadClassifiedImagesToS3(String bucketName, String filePath, String classifiedName) {
+        PutObjectRequest request = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key("classifiedImages/" + classifiedName + ".jpg")
+                .build();
+        PutObjectResponse res = s3Client.putObject(request, RequestBody.fromBytes(getObjectFile("./" + filePath)));
+        System.out.println(res);
     }
 
     private static byte[] getObjectFile(String filePath) {
