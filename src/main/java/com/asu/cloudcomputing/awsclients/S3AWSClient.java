@@ -24,7 +24,7 @@ public class S3AWSClient {
     public void uploadClassifiedImagesToS3(String bucketName, String filePath, String classifiedName) {
         PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(bucketName)
-                .key("classifiedImages/" + classifiedName + ".jpg")
+                .key("classifiedImages/" + classifiedName + ".jpeg")
                 .build();
         PutObjectResponse res = s3Client.putObject(request, RequestBody.fromBytes(getObjectFile("./" + filePath)));
         System.out.println(res);

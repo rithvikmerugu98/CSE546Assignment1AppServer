@@ -12,7 +12,7 @@ public class ImageDetail {
 
 
     public ImageDetail(String requestId, String receiptHandle) {
-        this.name = requestId + ".jpg";
+        this.name = requestId + ".jpeg";
         this.requestId = requestId;
         this.receiptHandle = receiptHandle;
     }

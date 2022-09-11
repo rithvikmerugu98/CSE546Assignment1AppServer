@@ -33,7 +33,7 @@ public class SQSAWSClient {
                 ByteArrayInputStream bis = new ByteArrayInputStream(Base64.getDecoder().decode(message.body()));
                 try {
                     BufferedImage bImage2 = ImageIO.read(bis);
-                    ImageIO.write(bImage2, "jpg", new File(requestId + ".jpg"));
+                    ImageIO.write(bImage2, "jpeg", new File(requestId + ".jpeg"));
                 } catch (IOException e) {
                     System.out.println("Unable to process image with request - " + requestId);
                     continue;

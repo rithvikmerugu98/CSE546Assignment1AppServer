@@ -40,7 +40,7 @@ public class ClassificationHandler {
     public List<ImageDetail> classifyImages(List<ImageDetail> imageDetails) throws IOException {
 
         for(ImageDetail imageDetail : imageDetails) {
-            String command = "python3 ./image_classification.py " + imageDetail.getName();
+            String command = "python3 ./image_classification.py ./CSE546Assignment1AppServer/" + imageDetail.getName();
             Process p = Runtime.getRuntime().exec(command, null, new File("../"));
             BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String scriptResult = in.readLine();
