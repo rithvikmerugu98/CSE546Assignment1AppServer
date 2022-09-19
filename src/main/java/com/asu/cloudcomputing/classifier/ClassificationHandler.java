@@ -59,7 +59,7 @@ public class ClassificationHandler {
         SQSAWSClient sqsClient = awsClientsProvider.getSQSClient();
         String responseQueueURL = props.getProperty("amazon.sqs.response-queue");
         for(ImageDetail details : imageDetails) {
-            sqsClient.publishMessages(responseQueueURL, details.getClassifiedName(), details.getRequestId(), details.getName());
+            sqsClient.publishMessages(responseQueueURL, details.getClassifiedName(), details.getRequestId());
         }
 
     }
@@ -87,6 +87,9 @@ public class ClassificationHandler {
 
     public void terminateInstance() {
         Ec2AWSClient ec2Client = awsClientsProvider.getEc2Client();
-        ec2Client.terminateInstance();
+        int instances = ec2Client.getActiveAppInstances().size();
+        if(instances > 2) {
+            ec2Client.terminateInstance();
+        }
     }
 }

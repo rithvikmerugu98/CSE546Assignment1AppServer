@@ -79,6 +79,10 @@
 			<version>2.13.4</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.awaitility</groupId>
+			<artifactId>awaitility</artifactId>
+		</dependency>
 
 	</dependencies>
 

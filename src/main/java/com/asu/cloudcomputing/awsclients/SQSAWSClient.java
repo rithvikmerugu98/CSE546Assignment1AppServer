@@ -44,11 +44,10 @@ public class SQSAWSClient {
         return response;
     }
 
-    public void publishMessages(String queueURL, String messageBody, String requestId, String name) {
+    public void publishMessages(String queueURL, String messageBody, String requestId) {
         Map<String, MessageAttributeValue> attr = new HashMap<>();
         attr.put("requestId", MessageAttributeValue.builder().dataType("String").stringValue(requestId).build());
-        attr.put("name", MessageAttributeValue.builder().dataType("String").stringValue(name).build());
-        sqsClient.sendMessage(SendMessageRequest.builder()
+         sqsClient.sendMessage(SendMessageRequest.builder()
                 .messageBody(messageBody)
                 .messageAttributes(attr)
                 .queueUrl(queueURL).build());

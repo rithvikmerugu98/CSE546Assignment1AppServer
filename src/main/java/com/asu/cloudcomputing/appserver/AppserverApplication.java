@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,6 +17,7 @@ import java.util.List;
 
 @SpringBootApplication
 @RestController
+@EnableScheduling
 public class AppserverApplication {
 
 	private static ClassificationHandler handler;
@@ -25,6 +28,7 @@ public class AppserverApplication {
 	}
 
 	@GetMapping("/classifyImage")
+	@Scheduled(fixedRate = 15000)
 	public String classifyImage() {
 		List<ImageDetail> imageDetails = handler.saveImagesFromQueue();
 		try {
@@ -36,7 +40,8 @@ public class AppserverApplication {
 		System.out.println(imageDetails);
 		handler.writeToResponseQueue(imageDetails);
 		// Deleting the entries in request SQS Queue
-		//handler.deleteFromRequestQueue(imageDetails);
+		//TODO Uncomment this line
+		handler.deleteFromRequestQueue(imageDetails);
 		// Save the images in the bucket
 		handler.saveToS3(imageDetails);
 		// Delete locally saved files
@@ -47,6 +52,11 @@ public class AppserverApplication {
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@GetMapping("/healthCheck")
+	public int healthCheck() {
+		return 200;
 	}
 
 	@GetMapping("/terminateInstance")
