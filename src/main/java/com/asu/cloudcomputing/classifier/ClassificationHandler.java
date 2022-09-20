@@ -32,7 +32,9 @@ public class ClassificationHandler {
         SQSAWSClient sqsClient = awsClientsProvider.getSQSClient();
         String requestQueueURL = props.getProperty("amazon.sqs.request-queue");
         List<ImageDetail> response = sqsClient.saveImageFromQueue(requestQueueURL);
-        System.out.println("Saved the images locally for " + response.stream().map(ImageDetail::getRequestId).collect(Collectors.joining(",")));
+        if(response.size() > 0) {
+            System.out.println("Saved the images locally for " + response.stream().map(ImageDetail::getRequestId).collect(Collectors.joining(",")));
+        }
         return response;
     }
 
@@ -45,7 +47,7 @@ public class ClassificationHandler {
             Process p = Runtime.getRuntime().exec(command, null, new File("../"));
             BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String scriptResult = in.readLine();
-            System.out.println("Classified request " + imageDetail.getRequestId() + " as " + scriptResult);
+            System.out.println("Classification script result - " + scriptResult);
             imageDetail.setClassifiedName(extractLabel(scriptResult));
 
         }
