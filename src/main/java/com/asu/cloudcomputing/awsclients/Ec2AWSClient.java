@@ -46,5 +46,9 @@ public class Ec2AWSClient {
         return instances;
     }
 
+    public static void main(String[] args) {
+        Ec2AWSClient client = new Ec2AWSClient(Region.US_EAST_1);
+        System.out.println(client.getActiveAppInstances());
+    }
 
 }

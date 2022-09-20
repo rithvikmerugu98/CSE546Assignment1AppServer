@@ -30,20 +30,22 @@ public class ClassificationHandler {
 
     public List<ImageDetail> saveImagesFromQueue() {
         SQSAWSClient sqsClient = awsClientsProvider.getSQSClient();
-
         String requestQueueURL = props.getProperty("amazon.sqs.request-queue");
         List<ImageDetail> response = sqsClient.saveImageFromQueue(requestQueueURL);
+        System.out.println("Saved the images locally for " + response.stream().map(ImageDetail::getRequestId).collect(Collectors.joining(",")));
         return response;
     }
 
 
     public List<ImageDetail> classifyImages(List<ImageDetail> imageDetails) throws IOException {
-
         for(ImageDetail imageDetail : imageDetails) {
+
+            System.out.println("Invoking the classification script for request - " + imageDetail.getRequestId());
             String command = "python3 ./image_classification.py ./CSE546Assignment1AppServer/" + imageDetail.getName();
             Process p = Runtime.getRuntime().exec(command, null, new File("../"));
             BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String scriptResult = in.readLine();
+            System.out.println("Classified request " + imageDetail.getRequestId() + " as " + scriptResult);
             imageDetail.setClassifiedName(extractLabel(scriptResult));
 
         }
@@ -60,6 +62,7 @@ public class ClassificationHandler {
         String responseQueueURL = props.getProperty("amazon.sqs.response-queue");
         for(ImageDetail details : imageDetails) {
             sqsClient.publishMessages(responseQueueURL, details.getClassifiedName(), details.getRequestId());
+            System.out.println("Response of request " + details.getRequestId() + " saved to response queue");
         }
 
     }
@@ -67,6 +70,7 @@ public class ClassificationHandler {
     public void deleteFromRequestQueue(List<ImageDetail> imageDetails) {
         SQSAWSClient sqsClient = awsClientsProvider.getSQSClient();
         String requestQueueURL = props.getProperty("amazon.sqs.request-queue");
+        System.out.println("Deleting processed messages from request Queue.");
         sqsClient.deleteMessages(requestQueueURL, imageDetails.stream().map(ImageDetail::getReceiptHandle).collect(Collectors.toList()));
     }
 
@@ -74,12 +78,15 @@ public class ClassificationHandler {
         for(ImageDetail details : imageDetails) {
             S3AWSClient s3Client = awsClientsProvider.getS3Client();
             String bucketName = props.getProperty("amazon.s3.bucket-name");
+            System.out.println("Saved the image for " + details.getClassifiedName() + "in S3.");
             s3Client.uploadClassifiedImagesToS3(bucketName, details.getName(), details.getClassifiedName());
         }
     }
 
     public void deleteFilesLocally(List<ImageDetail> imageDetails) {
         for(ImageDetail imageDetail : imageDetails) {
+
+            System.out.println("Deleting the local file - " + imageDetail.getName());
             File file = new File("./" + imageDetail.getName());
             file.delete();
         }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.List;
 
 @SpringBootApplication
@@ -30,6 +31,7 @@ public class AppserverApplication {
 	@GetMapping("/classifyImage")
 	@Scheduled(fixedRate = 15000)
 	public String classifyImage() {
+		System.out.println("Invoking the classify image api at " + LocalTime.now());
 		List<ImageDetail> imageDetails = handler.saveImagesFromQueue();
 		try {
 			imageDetails = handler.classifyImages(imageDetails);
@@ -37,10 +39,8 @@ public class AppserverApplication {
 			e.printStackTrace();
 		}
 		// Writing the response to response SQS Queue
-		System.out.println(imageDetails);
 		handler.writeToResponseQueue(imageDetails);
 		// Deleting the entries in request SQS Queue
-		//TODO Uncomment this line
 		handler.deleteFromRequestQueue(imageDetails);
 		// Save the images in the bucket
 		handler.saveToS3(imageDetails);
