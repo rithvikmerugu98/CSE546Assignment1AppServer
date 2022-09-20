@@ -27,7 +27,6 @@ public class S3AWSClient {
                 .key("classifiedImages/" + classifiedName + ".jpeg")
                 .build();
         PutObjectResponse res = s3Client.putObject(request, RequestBody.fromBytes(getObjectFile("./" + filePath)));
-        System.out.println(res);
     }
 
     private static byte[] getObjectFile(String filePath) {
