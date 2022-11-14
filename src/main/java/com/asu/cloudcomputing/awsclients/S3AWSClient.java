@@ -21,44 +21,12 @@ public class S3AWSClient {
         s3Client = S3Client.builder().region(region).build();
     }
 
-    public void uploadClassifiedImagesToS3(String bucketName, String filePath, String classifiedName) {
+    public void uploadClassifiedImagesToS3(String bucketName, String fileName, String classifiedName) {
         PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(bucketName)
-                .key("classifiedImages/" + classifiedName + ".jpeg")
+                .key("classifiedImages/" + fileName)
                 .build();
-        PutObjectResponse res = s3Client.putObject(request, RequestBody.fromBytes(getObjectFile("./" + filePath)));
-    }
-
-    private static byte[] getObjectFile(String filePath) {
-
-        FileInputStream fileInputStream = null;
-        byte[] bytesArray = null;
-
-        try {
-            File file = new File(filePath);
-            bytesArray = new byte[(int) file.length()];
-            try {
-                fileInputStream = new FileInputStream(file);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-            try {
-                fileInputStream.read(bytesArray);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-        } finally {
-            if (fileInputStream != null) {
-                try {
-                    fileInputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return bytesArray;
+        PutObjectResponse res = s3Client.putObject(request, RequestBody.fromString(classifiedName));
     }
 
 }

@@ -81,7 +81,7 @@ public class ClassificationHandler {
             S3AWSClient s3Client = awsClientsProvider.getS3Client();
             String bucketName = props.getProperty("amazon.s3.bucket-name");
             System.out.println("Saved the image for " + details.getClassifiedName() + "in S3.");
-            s3Client.uploadClassifiedImagesToS3(bucketName, details.getName(), details.getClassifiedName());
+            s3Client.uploadClassifiedImagesToS3(bucketName, details.getRequestId(), details.getClassifiedName());
         }
     }
 
